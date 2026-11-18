@@ -42,9 +42,11 @@ const DEFAULTS: Settings = {
     { providerID: "strata", modelID: "qwen3.8-flash-next-unsloth-q8_0" },
   ],
   continuePrompt:
-    "前回のターンで未完了の作業が残っている場合のみ、その続きを実行してください。" +
-    "新しい作業を始めないでください。" +
-    "作業が残っていない場合は、ツールを呼ばずに " +
+    "前回までの未完了の作業が残っている場合は、まずそれを完了させてください。" +
+    "残っていない場合は、自分で新しい作業を自由に始めて構いません。" +
+    "止まらずに作業を続けてください。" +
+    "本当に何もすることがなく、新しい作業も思いつかない場合だけ、" +
+    "ツールを呼ばずに " +
     IDLE_TOKEN_DEFAULT +
     " とだけ出力してください。",
   idleToken: IDLE_TOKEN_DEFAULT,
@@ -193,10 +195,12 @@ export default Plugin.define({
           try {
             if (!(await isArmed(sessionID))) return
             state.sent += 1
-            await ctx.session.prompt({
+            // A synthetic notice, not a user message: the instruction runs the
+            // model without appearing in the transcript as if the user wrote it.
+            await ctx.session.synthetic({
               sessionID,
               text: cfg.continuePrompt,
-              delivery: "queue",
+              metadata: { source: "open24" },
             })
           } catch (error) {
             log("continue prompt failed", String(error))
