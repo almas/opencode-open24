@@ -4,15 +4,27 @@
   "type": "module",
   "description": "OpenCode のシェル実行タイムアウトを撤廃し、セッション停止時に自動継続・モデル切替を行う 24/7 運用プラグイン",
   "license": "MIT",
-  "keywords": ["opencode", "opencode-plugin", "keep-alive", "auto-continue", "timeout"],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "keep-alive",
+    "auto-continue",
+    "timeout"
+  ],
   "exports": {
     ".": "./src/index.ts"
   },
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "dependencies": {
     "@opencode/plugin": "2.3.0"
   },
   "devDependencies": {
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.7"
+  },
+  "scripts": {
+    "test": "vitest run"
   }
 }

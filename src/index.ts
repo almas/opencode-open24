@@ -27,9 +27,9 @@ interface Settings {
   retryBaseDelayMs: number
 }
 
-const IDLE_TOKEN_DEFAULT = "[[OPEN24-IDLE]]"
+export const IDLE_TOKEN_DEFAULT = "[[OPEN24-IDLE]]"
 
-const DEFAULTS: Settings = {
+export const DEFAULTS: Settings = {
   enabled: true,
   armByDefault: false,
   armOnToolUse: true,
@@ -64,7 +64,7 @@ interface SessionState {
   lastCompleteAt?: number
 }
 
-function readSettings(raw: Readonly<Record<string, any>>): Settings {
+export function readSettings(raw: Readonly<Record<string, any>>): Settings {
   const num = (v: unknown, fallback: number, min: number): number => {
     const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN
     return Number.isFinite(n) && n >= min ? n : fallback
