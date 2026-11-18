@@ -257,8 +257,9 @@ export default Plugin.define({
         .map((part) => part.text as string)
         .join("\n")
       if (text.includes(cfg.idleToken)) {
-        await setArmed(sessionID, false)
-        trace("disarmed by idle token", sessionID)
+        // Pause this loop, but keep the session armed: the next user message
+        // starts a fresh execution and auto-continue resumes afterwards.
+        trace("idle token: loop paused until the next message", sessionID)
         return
       }
       const usedTool = content.some((part) => part?.type === "tool")
