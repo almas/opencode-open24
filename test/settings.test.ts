@@ -1,5 +1,21 @@
 import { describe, expect, it } from "vitest"
-import { DEFAULTS, IDLE_TOKEN_DEFAULT, readSettings } from "../src/index"
+import { DEFAULTS, IDLE_TOKEN_DEFAULT, IDLE_TOKEN_LEGACY, hasIdleToken, readSettings } from "../src/index"
+
+describe("hasIdleToken", () => {
+  it("detects the default HTML-comment marker", () => {
+    expect(hasIdleToken("done <!-- OPEN24-IDLE -->", IDLE_TOKEN_DEFAULT)).toBe(true)
+    expect(hasIdleToken("作業を続けました", IDLE_TOKEN_DEFAULT)).toBe(false)
+  })
+
+  it("still detects the legacy token when the default is in use", () => {
+    expect(hasIdleToken("done " + IDLE_TOKEN_LEGACY, IDLE_TOKEN_DEFAULT)).toBe(true)
+  })
+
+  it("does not let the legacy token pause a session with a custom token", () => {
+    expect(hasIdleToken("done " + IDLE_TOKEN_LEGACY, "[[CUSTOM]]")).toBe(false)
+    expect(hasIdleToken("done [[CUSTOM]]", "[[CUSTOM]]")).toBe(true)
+  })
+})
 
 describe("readSettings defaults", () => {
   it("uses safe defaults for empty options", () => {

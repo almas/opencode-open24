@@ -27,7 +27,17 @@ interface Settings {
   retryBaseDelayMs: number
 }
 
-export const IDLE_TOKEN_DEFAULT = "[[OPEN24-IDLE]]"
+// HTML コメント形式のマーカ―: タイムライン（Markdown 描画）では存在感ゼロで、
+// プラグイン側の検出はテキスト一致のまま動く。
+export const IDLE_TOKEN_DEFAULT = "<!-- OPEN24-IDLE -->"
+
+// 旧既定トークン。ユーザー設定で上書きしている場合や、以前の会話を踏んだ
+// モデルの出力を追検出できるよう、判定では引き続き受け付ける。
+export const IDLE_TOKEN_LEGACY = "[[OPEN24-IDLE]]"
+
+/** テキストに停止マーカーが含まれるか。既定トークンのときだけ旧形式も追検出する。 */
+export const hasIdleToken = (text: string, token: string): boolean =>
+  text.includes(token) || (token === IDLE_TOKEN_DEFAULT && text.includes(IDLE_TOKEN_LEGACY))
 
 export const DEFAULTS: Settings = {
   enabled: true,
@@ -48,7 +58,7 @@ export const DEFAULTS: Settings = {
     "本当に何もすることがなく、新しい作業も思いつかない場合だけ、" +
     "ツールを呼ばずに " +
     IDLE_TOKEN_DEFAULT +
-    " とだけ出力してください。",
+    " （HTML コメント。ユーザーには表示されません）とだけ出力してください。他の文章は不要です。",
   idleToken: IDLE_TOKEN_DEFAULT,
   noToolSoftLimit: 8,
   retryBaseDelayMs: 15_000,
@@ -256,7 +266,7 @@ export default Plugin.define({
         .filter((part) => part?.type === "text" && typeof part.text === "string")
         .map((part) => part.text as string)
         .join("\n")
-      if (text.includes(cfg.idleToken)) {
+      if (hasIdleToken(text, cfg.idleToken)) {
         // Pause this loop, but keep the session armed: the next user message
         // starts a fresh execution and auto-continue resumes afterwards.
         trace("idle token: loop paused until the next message", sessionID)
